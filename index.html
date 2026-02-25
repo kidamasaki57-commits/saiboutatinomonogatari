@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>細胞たちの物語 | 仕組みを知れば、体はもっと味方になる。</title>
+    
+    <!-- Google Fonts: 親しみやすい丸ゴシック体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff7b72',   // コーラルピンク（元気・親しみ）
+                        primaryLight: '#ffeae8',
+                        secondary: '#facc15', // ポップなイエロー
+                        accent: '#4ade80',    // 明るいグリーン
+                        background: '#fffbf0', // 温かいクリーム色の背景
+                        textmain: '#6b4f3b',   // ★ミルクチョコレートのような明るめのブラウン
+                        comicborder: '#6b4f3b' // ★コミック風の枠線の色も明るく統一
+                    },
+                    fontFamily: {
+                        sans: ['"M PLUS Rounded 1c"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        // 影の色も textmain に合わせて rgba(107, 79, 59, 1) に変更
+                        'comic': '6px 6px 0px 0px rgba(107, 79, 59, 1)',
+                        'comic-hover': '2px 2px 0px 0px rgba(107, 79, 59, 1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS for Comic Style & Animations -->
+    <style>
+        body {
+            color: #6b4f3b; /* 文字色を明るく */
+            background-color: #fffbf0;
+            background-image: radial-gradient(#ffeae8 2px, transparent 2px);
+            background-size: 30px 30px; /* スクリーントーン風の背景 */
+        }
+        
+        /* 吹き出しのしっぽ（下向き） */
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 15px 15px 0;
+            border-style: solid;
+            border-color: #ffffff transparent transparent transparent;
+            display: block;
+            width: 0;
+            z-index: 1;
+        }
+        /* 吹き出しのしっぽ枠線（下向き） */
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 18px 18px 0;
+            border-style: solid;
+            border-color: #6b4f3b transparent transparent transparent; /* 枠線色を明るく */
+            display: block;
+            width: 0;
+            z-index: 0;
+        }
+
+        .img-placeholder {
+            background-color: #ffeae8;
+            border: 4px solid #6b4f3b; /* 枠線色を明るく */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff7b72;
+            font-weight: bold;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* AI Chat Animation */
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #ff7b72;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-primary selection:text-white">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full bg-background/90 backdrop-blur-md z-50 border-b-4 border-comicborder transition-all duration-300" id="navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="text-xl font-extrabold text-primary flex items-center gap-2 drop-shadow-sm">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    <span>細胞たちの物語</span>
+                </a>
+                <div class="hidden md:flex space-x-6 text-sm font-bold text-textmain">
+                    <a href="#concept" class="hover:text-primary transition transform hover:scale-110">コンセプト</a>
+                    <a href="#products" class="hover:text-primary transition transform hover:scale-110">作品一覧</a>
+                    <a href="#ai-chat" class="hover:text-primary transition transform hover:scale-110">✨細胞に質問</a>
+                    <a href="#membership" class="hover:text-primary transition transform hover:scale-110">メンバーシップ</a>
+                </div>
+                <!-- Mobile menu button (Simplified for this demo) -->
+                <div class="md:hidden">
+                    <i data-lucide="menu" class="w-6 h-6 text-textmain"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center gap-12 fade-in">
+            
+            <!-- Text Content -->
+            <div class="md:w-1/2 text-center md:text-left">
+                <div class="inline-block relative mb-6">
+                    <span class="relative z-10 py-1 px-4 rounded-full bg-secondary text-textmain border-2 border-comicborder font-bold tracking-wider shadow-comic">
+                        体の中で働く細胞たちの物語
+                    </span>
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-textmain leading-tight mb-6">
+                    仕組みを知れば、<br>
+                    <span class="text-primary relative inline-block mt-2">
+                        体はもっと味方になる。
+                        <!-- 手書き風アンダーライン -->
+                        <svg class="absolute w-full h-4 -bottom-1 left-0 text-secondary" viewBox="0 0 100 20" preserveAspectRatio="none">
+                            <path d="M0 15 Q 50 0 100 15" stroke="currentColor" stroke-width="6" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </h1>
+                
+                <p class="text-lg md:text-xl font-bold text-textmain mb-10 leading-relaxed bg-white/80 p-4 rounded-2xl border-2 border-comicborder inline-block text-left">
+                    難しい医学の言葉ではなく、<br>
+                    物語とイラストで、体のしくみを大解剖！<br>
+                    あなたの体の中では、<br>
+                    今日もかわいい細胞たちが働いています。
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center md:justify-start gap-6">
+                    <a href="#products" class="inline-flex justify-center items-center px-8 py-4 rounded-2xl text-white bg-primary border-4 border-comicborder shadow-comic hover:shadow-comic-hover hover:translate-y-1 hover:translate-x-1 transition-all duration-200 font-bold text-xl">
+                        最新の物語を読む
+                        <i data-lucide="book-open" class="ml-2 w-6 h-6"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Image/Illustration Area -->
+            <div class="md:w-1/2 w-full relative">
+                <!-- 吹き出し -->
+                <div class="absolute -top-10 right-10 bg-white border-4 border-comicborder rounded-3xl p-4 font-bold text-lg shadow-comic z-20 speech-bubble transform rotate-3 text-textmain">
+                    今日も平和だ〜！
+                </div>
+                
+                <div class="img-placeholder rounded-3xl w-full aspect-[4/3] shadow-comic transform -rotate-2">
+                    <div class="flex flex-col items-center p-4">
+                        <i data-lucide="image" class="w-16 h-16 mb-2"></i>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Concept Section (Comic Strip Style) -->
+    <section id="concept" class="py-20 bg-primaryLight border-y-4 border-comicborder relative">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-textmain inline-block bg-white px-8 py-3 rounded-full border-4 border-comicborder shadow-comic transform -rotate-1">
+                    なぜ、物語なのか？
+                </h2>
+            </div>
+
+            <!-- 漫画のコマ割り風レイアウト -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <!-- コマ1 -->
+                <div class="bg-white border-4 border-comicborder p-4 rounded-2xl shadow-comic flex flex-col items-center">
+                    <div class="img-placeholder w-full h-40 rounded-xl mb-4 bg-orange-100">
+                        <span class="text-sm text-textmain"></span>
+                    </div>
+                    <p class="font-bold text-center text-lg text-textmain">ミトコンドリアが燃え、</p>
+                </div>
+                <!-- コマ2 -->
+                <div class="bg-white border-4 border-comicborder p-4 rounded-2xl shadow-comic flex flex-col items-center md:transform md:-translate-y-4">
+                    <div class="img-placeholder w-full h-40 rounded-xl mb-4 bg-blue-100">
+                        <span class="text-sm text-textmain"></span>
+                    </div>
+                    <p class="font-bold text-center text-lg text-textmain">免疫細胞が戦い、</p>
+                </div>
+                <!-- コマ3 -->
+                <div class="bg-white border-4 border-comicborder p-4 rounded-2xl shadow-comic flex flex-col items-center">
+                    <div class="img-placeholder w-full h-40 rounded-xl mb-4 bg-green-100">
+                        <span class="text-sm text-textmain"></span>
+                    </div>
+                    <p class="font-bold text-center text-lg text-textmain">抗酸化物質が守り続ける。</p>
+                </div>
+            </div>
+
+            <div class="bg-white border-4 border-comicborder rounded-3xl p-8 shadow-comic max-w-3xl mx-auto text-center relative">
+                <!-- 装飾 -->
+                <i data-lucide="quote" class="absolute top-4 left-4 w-10 h-10 text-primaryLight/80"></i>
+                
+                <p class="text-xl font-bold leading-loose mb-6 relative z-10 text-textmain">
+                    体の中では、細胞たちが毎日ドラマを繰り広げています。<br>
+                    でも、それを学校で教わることはほとんどありません。
+                </p>
+                <p class="text-xl font-bold leading-loose mb-8 relative z-10 text-textmain">
+                    このサイトでは、細胞たちを「登場人物」として描き、<br>
+                    <span class="bg-secondary px-2 rounded">本当に役立つ医学知識</span>を、<br>
+                    わかりやすく正確にお届けします。
+                </p>
+                
+                <div class="text-2xl font-extrabold text-primary border-t-4 border-dashed border-primaryLight pt-6">
+                    難しすぎない。でも浅くない。<br>
+                    それが私の目指す健康コンテンツです。
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products / Comics Section -->
+    <section id="products" class="py-24 bg-background">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+            <div class="flex items-center justify-center gap-4 mb-16">
+                <i data-lucide="book" class="w-10 h-10 text-primary"></i>
+                <h2 class="text-4xl font-extrabold text-textmain">作品一覧</h2>
+                <i data-lucide="book" class="w-10 h-10 text-primary"></i>
+            </div>
+
+            <!-- メイン商品カード（コミック風） -->
+            <div class="bg-white border-4 border-comicborder rounded-[2rem] shadow-comic overflow-hidden flex flex-col lg:flex-row relative">
+                
+                <!-- NEW Badge -->
+                <div class="absolute top-0 left-0 bg-secondary text-textmain font-extrabold py-2 px-10 transform -rotate-45 -translate-x-10 translate-y-6 border-4 border-comicborder shadow-sm z-20">
+                    NEW!!
+                </div>
+
+                <!-- 画像エリア -->
+                <div class="lg:w-1/2 p-6 lg:border-r-4 border-comicborder bg-[#fdf2e9]">
+                    <div class="img-placeholder w-full aspect-square md:aspect-video lg:aspect-square rounded-2xl shadow-inner text-textmain border-comicborder">
+                        <div class="p-4 text-center">
+                            <span class="block mb-2 font-bold"></span>
+                            <span class="text-sm opacity-80 font-bold">グルタチオンおばあちゃんや、<br>困っている細胞のイラスト</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- テキストエリア -->
+                <div class="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center relative">
+                    <span class="text-primary font-extrabold text-xl mb-2">Vol.1</span>
+                    <h3 class="text-3xl font-extrabold text-textmain mb-4 leading-tight">
+                        酸化した油は、<br>体の中で何をしているのか？
+                    </h3>
+                    <p class="text-xl font-bold text-textmain mb-6 bg-yellow-100 inline-block px-3 py-1 rounded-lg w-fit transform -rotate-1">
+                        〜グルタチオンおばあちゃん物語〜
+                    </p>
+                    
+                    <p class="text-lg font-bold text-textmain mb-8 leading-relaxed">
+                        揚げ物や加工食品に含まれる「酸化した油」。<br>
+                        それは体の中で何を起こしているのか！？<br>
+                        細胞の世界を舞台に、抗酸化の守護者「グルタチオンおばあちゃん」が王国を守る物語。
+                    </p>
+
+                    <div class="bg-primaryLight border-2 border-primary rounded-xl p-4 mb-8">
+                        <ul class="space-y-3 font-bold text-textmain">
+                            <li class="flex items-center">
+                                <i data-lucide="check-circle" class="w-6 h-6 text-primary mr-3 flex-shrink-0"></i>
+                                一般向けに、漫画と図解でわかりやすく！
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check-circle" class="w-6 h-6 text-primary mr-3 flex-shrink-0"></i>
+                                今日からできる実践対策付き
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check-circle" class="w-6 h-6 text-primary mr-3 flex-shrink-0"></i>
+                                約20ページ／スマホ・PC対応PDF
+                            </li>
+                        </ul>
+                    </div>
+
+                    <a href="#" class="inline-flex justify-center items-center px-8 py-4 rounded-xl text-textmain bg-secondary border-4 border-comicborder shadow-comic hover:shadow-comic-hover hover:translate-y-1 hover:translate-x-1 transition-all duration-200 font-bold text-xl text-center">
+                        詳細を見る（noteへ）
+                        <i data-lucide="arrow-up-right" class="ml-2 w-6 h-6"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Chat Section (Gemini API) -->
+    <section id="ai-chat" class="py-20 bg-[#fdf2e9] border-y-4 border-comicborder relative overflow-hidden">
+        <!-- 背景装飾 -->
+        <div class="absolute top-5 left-5 w-16 h-16 bg-white rounded-full border-4 border-comicborder opacity-40"></div>
+        <div class="absolute bottom-10 right-10 w-24 h-24 bg-secondary rounded-full border-4 border-comicborder opacity-30"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 fade-in">
+            <div class="text-center mb-10">
+                <span class="inline-block bg-white text-primary font-extrabold px-4 py-1 rounded-full border-2 border-comicborder shadow-sm transform -rotate-2 mb-2">✨ 新機能 ✨</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-textmain mb-4">細胞たちに質問してみよう！</h2>
+                <p class="font-bold text-textmain bg-white/60 inline-block px-4 py-2 rounded-xl border-2 border-comicborder">
+                    体の悩みや不思議なこと、なんでも聞いてね。<br>
+                    体の中の細胞さんが、直接答えてくれるよ！
+                </p>
+            </div>
+
+            <div class="bg-white border-4 border-comicborder rounded-3xl shadow-comic overflow-hidden flex flex-col h-[500px]">
+                <!-- Chat History Area -->
+                <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-6 bg-background/50">
+                    <!-- Welcome Message -->
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-primaryLight border-2 border-comicborder rounded-full flex items-center justify-center flex-shrink-0 text-2xl shadow-sm">
+                            🦠
+                        </div>
+                        <div class="bg-white border-2 border-comicborder rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[80%] speech-bubble relative">
+                            <p class="font-bold text-textmain">やっほー！僕はキミの体で働く細胞だよ✨<br>今日はどうしたの？「甘いものがやめられない」「最近疲れやすい」とか、なんでも相談してね！</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 bg-white border-t-4 border-comicborder">
+                    <form id="chat-form" class="flex gap-2">
+                        <input type="text" id="chat-input" placeholder="例：どうして眠くなるの？" class="flex-1 border-2 border-comicborder rounded-xl px-4 py-3 font-bold text-textmain focus:outline-none focus:border-primary focus:ring-2 focus:ring-primaryLight transition placeholder-gray-400" required>
+                        <button type="submit" id="chat-submit" class="bg-secondary text-textmain border-4 border-comicborder rounded-xl px-6 py-3 font-extrabold hover:bg-yellow-300 hover:-translate-y-1 transition-transform shadow-sm flex items-center gap-2">
+                            <span>送信</span>
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <p class="text-center text-sm font-bold text-textmain/80 mt-4">※AI（Gemini）が回答します。実際の医療相談の代わりにはなりません。</p>
+        </div>
+    </section>
+
+    <!-- Membership Section -->
+    <section id="membership" class="py-20 bg-secondary/20 border-b-4 border-comicborder relative overflow-hidden">
+        <!-- 背景のポップな図形 -->
+        <div class="absolute top-10 left-10 w-20 h-20 bg-white rounded-full border-4 border-comicborder opacity-50"></div>
+        <div class="absolute bottom-10 right-10 w-32 h-32 bg-primary rounded-full border-4 border-comicborder opacity-20"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 fade-in">
+            <div class="bg-white border-4 border-comicborder rounded-3xl p-8 md:p-12 shadow-comic text-center">
+                
+                <div class="w-24 h-24 bg-primaryLight rounded-full border-4 border-comicborder flex items-center justify-center mx-auto mb-6 transform -translate-y-16 -mb-10 shadow-sm">
+                    <i data-lucide="users" class="w-12 h-12 text-primary"></i>
+                </div>
+
+                <h2 class="text-3xl font-extrabold text-textmain mb-4">もっと深く学びたい方へ</h2>
+                <p class="text-xl font-bold text-textmain mb-8">
+                    物語の続きを、より深い医学解説とともに。
+                </p>
+
+                <div class="grid sm:grid-cols-2 gap-4 mb-10 text-left">
+                    <div class="bg-background border-2 border-comicborder p-4 rounded-xl flex items-center font-bold text-textmain">
+                        <i data-lucide="file-text" class="w-8 h-8 text-primary mr-4"></i>
+                        毎月の新作PDF
+                    </div>
+                    <div class="bg-background border-2 border-comicborder p-4 rounded-xl flex items-center font-bold text-textmain">
+                        <i data-lucide="mic" class="w-8 h-8 text-secondary mr-4"></i>
+                        制作の裏話・限定解説
+                    </div>
+                    <div class="bg-background border-2 border-comicborder p-4 rounded-xl flex items-center font-bold text-textmain">
+                        <i data-lucide="video" class="w-8 h-8 text-accent mr-4"></i>
+                        Zoom講座（月1回予定）
+                    </div>
+                    <div class="bg-background border-2 border-comicborder p-4 rounded-xl flex items-center font-bold text-textmain">
+                        <i data-lucide="star" class="w-8 h-8 text-orange-400 mr-4"></i>
+                        先行公開コンテンツ
+                    </div>
+                </div>
+
+                <div class="bg-yellow-100 p-6 rounded-2xl border-4 border-comicborder mb-8 transform rotate-1 inline-block">
+                    <p class="text-2xl font-extrabold text-textmain">
+                        「なんとなく健康」から<br>
+                        <span class="text-primary">「理解して選べる健康」へ。</span>
+                    </p>
+                </div>
+
+                <br>
+
+                <a href="#" class="inline-flex justify-center items-center px-10 py-4 rounded-full text-white bg-primary border-4 border-comicborder shadow-comic hover:shadow-comic-hover hover:translate-y-1 hover:translate-x-1 transition-all duration-200 font-bold text-xl">
+                    メンバーシップに参加する
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Free Content & Profile -->
+    <section class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12">
+                
+                <!-- Free Content -->
+                <div class="fade-in border-4 border-comicborder rounded-3xl p-8 bg-background relative">
+                    <!-- キャラクタープレースホルダー -->
+                    <div class="absolute -top-10 -left-6 w-24 h-24 img-placeholder rounded-full transform -rotate-12 shadow-sm border-comicborder">
+                        <span class="text-xs text-textmain font-bold">[Image:<br>案内キャラ]</span>
+                    </div>
+
+                    <h2 class="text-2xl font-extrabold text-textmain mb-6 pt-4 ml-12">まずはここから！<br>無料コンテンツ</h2>
+                    <p class="font-bold text-textmain mb-6">無料で読めるミニ解説や投稿も用意しています。</p>
+                    
+                    <div class="space-y-4 mb-8">
+                        <a href="#" class="block bg-white border-2 border-comicborder p-4 rounded-xl font-bold text-textmain hover:bg-primaryLight transition flex justify-between items-center group">
+                            <span>ショート医学ストーリー</span>
+                            <i data-lucide="chevron-right" class="group-hover:translate-x-1 transition"></i>
+                        </a>
+                        <a href="#" class="block bg-white border-2 border-comicborder p-4 rounded-xl font-bold text-textmain hover:bg-primaryLight transition flex justify-between items-center group">
+                            <span>健康の誤解シリーズ</span>
+                            <i data-lucide="chevron-right" class="group-hover:translate-x-1 transition"></i>
+                        </a>
+                        <a href="#" class="block bg-white border-2 border-comicborder p-4 rounded-xl font-bold text-textmain hover:bg-primaryLight transition flex justify-between items-center group">
+                            <span>体のしくみ解説</span>
+                            <i data-lucide="chevron-right" class="group-hover:translate-x-1 transition"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- SNS & Zoom -->
+                <div class="fade-in border-4 border-comicborder rounded-3xl p-8 bg-[#fdf2e9] relative">
+                    <h2 class="text-2xl font-extrabold text-textmain mb-6">日々の発信はこちら！</h2>
+                    <p class="font-bold text-textmain mb-6">物語の一部や最新情報を発信しています。フォローしてね！</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <a href="#" class="bg-white border-2 border-comicborder p-3 rounded-xl font-bold text-textmain flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition shadow-sm hover:shadow-none translate-y-0 hover:translate-y-1">
+                            <i data-lucide="twitter" class="w-8 h-8 text-[#1DA1F2]"></i>
+                            <span>X (Twitter)</span>
+                        </a>
+                        <a href="#" class="bg-white border-2 border-comicborder p-3 rounded-xl font-bold text-textmain flex flex-col items-center justify-center gap-2 hover:bg-pink-50 transition shadow-sm hover:shadow-none translate-y-0 hover:translate-y-1">
+                            <i data-lucide="instagram" class="w-8 h-8 text-[#E1306C]"></i>
+                            <span>Instagram</span>
+                        </a>
+                        <a href="#" class="bg-white border-2 border-comicborder p-3 rounded-xl font-bold text-textmain flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition shadow-sm hover:shadow-none translate-y-0 hover:translate-y-1">
+                            <i data-lucide="youtube" class="w-8 h-8 text-[#FF0000]"></i>
+                            <span>YouTube</span>
+                        </a>
+                        <a href="#" class="bg-white border-2 border-comicborder p-3 rounded-xl font-bold text-textmain flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition shadow-sm hover:shadow-none translate-y-0 hover:translate-y-1">
+                            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.34 2.88 2.88 0 0 1 2.31-4.53 2.66 2.66 0 0 1 1.61.53V9.5a5.74 5.74 0 0 0-2.64-.64 6.33 6.33 0 0 0-4.11 11.16 6.34 6.34 0 0 0 9.07-5.83V6.9a8.62 8.62 0 0 0 6.18 2.58V6.03a6.1 6.1 0 0 1-2.58-.33z"/></svg>
+                            <span>TikTok</span>
+                        </a>
+                    </div>
+                    
+                    <a href="#" class="flex items-center justify-center bg-white border-2 border-comicborder p-4 rounded-xl font-bold text-textmain hover:bg-blue-50 transition">
+                        <i data-lucide="video" class="w-6 h-6 mr-2 text-blue-500"></i> Zoom講座情報はこちら
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section id="profile" class="py-20 bg-primaryLight border-t-4 border-comicborder">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 fade-in">
+            <div class="bg-white border-4 border-comicborder rounded-[2rem] p-8 md:p-12 shadow-comic">
+                <div class="flex flex-col md:flex-row items-center gap-8 mb-8 border-b-4 border-dashed border-primaryLight pb-8">
+                    <div class="w-32 h-32 img-placeholder rounded-full flex-shrink-0 shadow-sm border-comicborder">
+                        <span class="text-sm font-bold text-textmain">[Image of<br>プロフィール<br>似顔絵]</span>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-textmain mb-4">なぜ、私はこれを作っているのか。</h2>
+                        <p class="font-bold text-lg text-textmain">
+                            健康情報はあふれています。<br>
+                            でも「何を信じればいいか」「極端な情報」「怖いだけ」…<br>
+                            そんな現状を変えたいと思いました。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-6 text-lg font-bold text-textmain text-center">
+                    <div class="inline-block bg-secondary px-6 py-3 rounded-2xl border-2 border-comicborder transform rotate-1 mb-4">
+                        体は、敵ではありません。<br>
+                        油も、糖も、悪そのものではありません。
+                    </div>
+                    
+                    <p class="text-xl">
+                        大切なのは<span class="text-primary border-b-4 border-primary pb-1 mx-1 text-2xl">「仕組みを知ること」</span>。
+                    </p>
+                    
+                    <p>
+                        仕組みがわかれば、過剰に怖がらず、<br class="hidden sm:block">
+                        でも無防備にもならない。
+                    </p>
+                    
+                    <div class="mt-8 pt-8 text-2xl font-extrabold text-textmain">
+                        細胞たちの声を、あなたに届けたい。<br>
+                        それが、このプロジェクトの始まりです。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer & Contact -->
+    <footer class="bg-textmain text-white py-16 border-t-8 border-primary">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in">
+            
+            <div class="bg-white/10 p-8 rounded-3xl mb-12 border-2 border-white/20">
+                <h2 class="text-2xl font-extrabold mb-4">お問い合わせ・お仕事のご相談</h2>
+                <p class="mb-8 font-bold">
+                    ご質問・講座依頼・コラボのご相談は<br class="sm:hidden">こちらからお気軽にどうぞ！
+                </p>
+                
+                <a href="#" class="inline-flex justify-center items-center px-8 py-4 rounded-full text-textmain bg-secondary border-4 border-transparent hover:border-white transition-all duration-300 font-extrabold text-lg">
+                    <i data-lucide="mail" class="mr-2 w-6 h-6"></i>
+                    お問い合わせフォームへ
+                </a>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2 text-2xl font-extrabold">
+                    <i data-lucide="sparkles" class="w-8 h-8 text-primary"></i>
+                    <span>細胞たちの物語</span>
+                </div>
+                <div class="font-bold text-white/50">
+                    &copy; 2024 細胞たちの物語. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Initialize icons
+        lucide.createIcons();
+
+        // Scroll Animation (Fade-in with pop effect)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'scale-100');
+                    entry.target.classList.remove('opacity-0', 'scale-95', 'translate-y-8');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.classList.add('opacity-0', 'scale-95', 'translate-y-8', 'transition-all', 'duration-500', 'ease-out');
+            observer.observe(el);
+        });
+
+        // --- Gemini API Chat Logic ---
+        const apiKey = ""; // 実行環境から提供されます
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatHistory = document.getElementById('chat-history');
+        const chatSubmitBtn = document.getElementById('chat-submit');
+
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    const delay = Math.pow(2, i) * 1000;
+                    await new Promise(res => setTimeout(res, delay));
+                }
+            }
+        }
+
+        async function getGeminiResponse(userMessage) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const systemInstruction = `あなたは人間の体の中で働く細胞たちの代表です。
+ユーザーからの健康に関する質問や悩みに対して、医学的根拠に基づきつつ、小学生でもわかるような優しい『物語風』の言葉で答えてください。
+一人称は「僕たち細胞」や、特定のキャラクター（例：ミトコンドリアさん、白血球隊長、ブドウ糖ちゃんなど）を使ってください。
+語尾は「〜だよ！」「〜なんだ✨」など親しみやすくし、絵文字をたくさん使って、明るく励ますようなトーンにしてください。
+長すぎず、要点を絞って3〜4文程度で簡潔に答えてください。`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userMessage }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            try {
+                const data = await fetchWithRetry(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "ごめんね、ちょっと今忙しくてうまく答えられないや💦 もう一回聞いてみて！";
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return "通信エラーみたいだ💦 体の中のネットワークが混雑してるかも。あとでもう一度試してね！";
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-start gap-4 ${sender === 'user' ? 'flex-row-reverse' : ''}`;
+            
+            const avatar = sender === 'user' ? '👤' : '🦠';
+            const avatarBg = sender === 'user' ? 'bg-secondary' : 'bg-primaryLight';
+            const bubbleStyle = sender === 'user' 
+                ? 'bg-primary text-white border-2 border-comicborder rounded-2xl rounded-tr-none' 
+                : 'bg-white border-2 border-comicborder rounded-2xl rounded-tl-none speech-bubble';
+
+            let contentHTML = text;
+            if (text === 'loading') {
+                contentHTML = `<div class="typing-indicator px-2"><span></span><span></span><span></span></div>`;
+            }
+
+            messageDiv.innerHTML = `
+                <div class="w-12 h-12 ${avatarBg} border-2 border-comicborder rounded-full flex items-center justify-center flex-shrink-0 text-2xl shadow-sm">
+                    ${avatar}
+                </div>
+                <div class="${bubbleStyle} p-4 shadow-sm max-w-[80%] relative">
+                    <div class="font-bold leading-relaxed ${sender === 'user' ? 'text-white' : 'text-textmain'}">${contentHTML}</div>
+                </div>
+            `;
+            
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            return messageDiv;
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            chatInput.value = '';
+            chatInput.disabled = true;
+            chatSubmitBtn.disabled = true;
+
+            appendMessage('user', message);
+            const loadingMsgDiv = appendMessage('bot', 'loading');
+
+            const reply = await getGeminiResponse(message);
+
+            chatHistory.removeChild(loadingMsgDiv);
+            appendMessage('bot', reply);
+
+            chatInput.disabled = false;
+            chatSubmitBtn.disabled = false;
+            chatInput.focus();
+        });
+    </script>
+</body>
+</html>
